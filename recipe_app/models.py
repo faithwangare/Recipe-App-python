@@ -1,8 +1,7 @@
 import os
-import sys
-from sqlalchemy import create_engine, Column, Integer, String, Text
+from sqlalchemy import create_engine, Column, Integer, String, Text, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import relationship, sessionmaker
 
 Base = declarative_base()
 engine = create_engine('sqlite:///db/recipes.db', echo=True)
@@ -17,6 +16,9 @@ class Recipe(Base):
     name = Column(String())
     ingredients = Column(Text)
     instructions = Column(Text)
+    chef_id = Column(Integer, ForeignKey('chefs.id'))
+
+    chef = relationship("Chef", backref="recipes")
 
     def __repr__(self):
         return f'Recipe: {self.name}'
@@ -30,8 +32,8 @@ class Recipe(Base):
         return session.query(cls).filter_by(name=name).first()
 
     @classmethod
-    def create_recipe(cls, name, ingredients, instructions):
-        recipe = cls(name=name, ingredients=ingredients, instructions=instructions)
+    def create_recipe(cls, name, ingredients, instructions, chef):
+        recipe = cls(name=name, ingredients=ingredients, instructions=instructions, chef=chef)
         session.add(recipe)
         session.commit()
         return recipe
@@ -50,20 +52,39 @@ class Recipe(Base):
         session.commit()
 
 
+class Chef(Base):
+    __tablename__ = 'chefs'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String())
+    speciality = Column(String())
+
+    def __repr__(self):
+        return f'Chef: {self.name}'
+
+    def get_recipes(self):
+        return session.query(Recipe).filter_by(chef=self).all()
+
+
 Base.metadata.create_all(engine)
 
 
 if __name__ == '__main__':
-    # Create some sample recipes
+    # Create some sample instances
+    chef1 = Chef(name='John', speciality='Italian Cuisine')
+    chef2 = Chef(name='Jane', speciality='French Cuisine')
+
     recipe1 = Recipe.create_recipe(
         name='Pancakes',
         ingredients='Flour, Milk, Eggs, Sugar',
-        instructions='1. Mix all ingredients. 2. Cook on a griddle.'
+        instructions='1. Mix all ingredients. 2. Cook on a griddle.',
+        chef=chef1
     )
     recipe2 = Recipe.create_recipe(
         name='Spaghetti Bolognese',
         ingredients='Ground beef, Onion, Garlic, Tomato sauce, Spaghetti',
-        instructions='1. Brown the ground beef. 2. Saute onion and garlic. 3. Add tomato sauce. 4. Serve with cooked spaghetti.'
+        instructions='1. Brown the ground beef. 2. Saute onion and garlic. 3. Add tomato sauce. 4. Serve with cooked spaghetti.',
+        chef=chef2
     )
 
     # Get all recipes
