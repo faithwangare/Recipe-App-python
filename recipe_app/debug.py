@@ -1,5 +1,5 @@
 from ipdb import set_trace
-from models import Recipe, Chef, Base, engine, Session
+from models import Recipe, Chef, Category, Base, engine, Session
 
 # Create the database tables
 Base.metadata.create_all(engine)
@@ -11,16 +11,21 @@ session = Session()
 chef1 = Chef(name='John', speciality='Italian Cuisine')
 chef2 = Chef(name='Jane', speciality='French Cuisine')
 
+category1 = Category(name='Breakfast')
+category2 = Category(name='Dinner')
+
 recipe1 = Recipe.create_recipe(
     name='Pancakes',
     ingredients='Flour, Milk, Eggs, Sugar',
     instructions='1. Mix all ingredients. 2. Cook on a griddle.',
+    category=category1,
     chef=chef1
 )
 recipe2 = Recipe.create_recipe(
     name='Spaghetti Bolognese',
     ingredients='Ground beef, Onion, Garlic, Tomato sauce, Spaghetti',
     instructions='1. Brown the ground beef. 2. Saute onion and garlic. 3. Add tomato sauce. 4. Serve with cooked spaghetti.',
+    category=category2,
     chef=chef2
 )
 
@@ -38,7 +43,9 @@ if recipe:
 # Update a recipe
 if recipe:
     recipe.update_recipe(ingredients='Flour, Milk, Eggs, Sugar, Vanilla extract')
+
 set_trace()
+
 # Delete a recipe
 if recipe:
     recipe.delete_recipe()
