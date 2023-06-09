@@ -1,7 +1,10 @@
 import os
+import sys
+
+sys.path.append(os.getcwd())
 from sqlalchemy import create_engine, Column, Integer, String, Text, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 engine = create_engine('sqlite:///db/recipes.db', echo=True)
@@ -70,7 +73,7 @@ Base.metadata.create_all(engine)
 
 
 if __name__ == '__main__':
-    # Create some sample instances
+    # Create some instances
     chef1 = Chef(name='John', speciality='Italian Cuisine')
     chef2 = Chef(name='Jane', speciality='French Cuisine')
 
