@@ -21,8 +21,6 @@ class Recipe(Base):
     instructions = Column(Text)
     chef_id = Column(Integer, ForeignKey('chefs.id'))
 
-    chef = relationship("Chef", backref="recipes")
-
     def __repr__(self):
         return f'Recipe: {self.name}'
 
@@ -36,7 +34,7 @@ class Recipe(Base):
 
     @classmethod
     def create_recipe(cls, name, ingredients, instructions, chef):
-        recipe = cls(name=name, ingredients=ingredients, instructions=instructions, chef=chef)
+        recipe = cls(name=name, ingredients=ingredients, instructions=instructions, chef_id=chef.id)
         session.add(recipe)
         session.commit()
         return recipe
@@ -61,6 +59,8 @@ class Chef(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String())
     speciality = Column(String())
+
+    recipes = relationship("Recipe", backref="chef")
 
     def __repr__(self):
         return f'Chef: {self.name}'
